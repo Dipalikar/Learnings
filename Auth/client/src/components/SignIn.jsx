@@ -1,0 +1,85 @@
+import { ChromiumIcon, FacebookIcon, Linkedin } from "lucide-react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import signin_img from "../assets/signin_img.svg"
+
+const SignIn = () => {
+  const navigate = useNavigate();
+  const onSubmitHandler = (e) => {
+    e.preventDefault();
+  };
+
+  const openSignUp = () => {
+    navigate("/sign-up");
+  };
+
+  return (
+    <div className="flex flex-row h-screen">
+      {/* Left Side */}
+      <div className="flex flex-1 flex-col items-center justify-center bg-white p-10">
+        <h1 className="text-4xl font-semibold ">
+          Welcome back!
+        </h1>
+        <p className="text-sm text-slate-500">Let's get some work done</p>
+
+        <form
+          onSubmit={onSubmitHandler}
+          className="flex flex-col items-center justify-between w-[60%] gap-5 mt-5 "
+        >
+                    <input
+            type="text"
+            placeholder="Username"
+            className="w-full border p-2 pl-6 rounded-4xl"
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full border p-2 pl-6 rounded-4xl"
+            required
+          />
+
+          <p className="text-sm mt-2 text-slate-500 cursor-pointer">Forgot password?</p>
+
+          
+
+          <button className="bg-[#1a1999] text-white p-2 w-[45%] rounded-4xl mt-2 cursor-pointer">
+            Login
+          </button>
+
+          <div className="flex flex-col items-center ">
+            <p className="text-sm mt-2 text-slate-500">or continue with</p>
+            <div className="flex text-xl p-2 gap-4">
+              <p className="p-2 bg-[#1a1999] rounded-full cursor-pointer">
+                <FacebookIcon className="text-white h-6 w-6" />
+              </p>
+              <p className="p-2 bg-[#1a1999] rounded-full cursor-pointer ">
+                <ChromiumIcon className="text-white h-6 w-6 " />
+              </p>
+              <p className="p-2 bg-[#1a1999] rounded-full cursor-pointer">
+                <Linkedin className="text-white h-6 w-6 " />
+              </p>
+            </div>
+          </div>
+        </form>
+
+        <p className="text-sm mt-16 text-slate-500">
+          Not a member?
+          <span className="text-[#1a1999] cursor-pointer" onClick={openSignUp}> Register now</span>
+        </p>
+      </div>
+
+      {/* Right Side */}
+      <div className="flex flex-1 items-center justify-center bg-gray-100">
+        <img
+          src={signin_img}
+          className="h-full w-full object-cover"
+          alt="image"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default SignIn;

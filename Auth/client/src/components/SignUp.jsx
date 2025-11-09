@@ -1,9 +1,16 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChromiumIcon, FacebookIcon, Linkedin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import signup_image from "../assets/signup_img.svg"
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const onSubmitHandler = (e) => {
     e.preventDefault();
+  };
+
+  const openSignIn = () => {
+    navigate("/sign-in");
   };
 
   return (
@@ -11,7 +18,7 @@ const SignUp = () => {
       {/* Left Side */}
       <div className="flex flex-1 items-center justify-center bg-gray-100">
         <img
-          src="https://i.pinimg.com/1200x/7c/59/5b/7c595b64686d2ba8522eed9d844c0be3.jpg"
+          src={signup_image}
           className="h-full w-full object-cover"
           alt="image"
         />
@@ -77,7 +84,10 @@ const SignUp = () => {
 
         <p className="text-sm mt-2 text-slate-500">
           Already a member?
-          <span className="text-[#d96d18] cursor-pointer"> Sign in</span>
+          <span className="text-[#d96d18] cursor-pointer" onClick={openSignIn}>
+            {" "}
+            Sign in
+          </span>
         </p>
       </div>
     </div>
