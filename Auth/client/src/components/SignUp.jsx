@@ -1,16 +1,47 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChromiumIcon, FacebookIcon, Linkedin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import signup_image from "../assets/signup_img.svg"
+import signup_image from "../assets/signup_img.svg";
+import { toast } from "react-hot-toast";
+import { useState } from "react";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const [password, setPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState();
+
   const onSubmitHandler = (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      toast.error("Confirm password does not match");
+    }
+  }
+  const validatePassword = (password) => {
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long!");
+    } else if (!/[A-Z]/.test(password)) {
+      toast.error("Password must contain at least one uppercase letter!");
+    } else if (!/[a-z]/.test(password)) {
+      toast.error("Password must contain at least one lowercase letter!");
+    } else if (!/[0-9]/.test(password)) {
+      toast.error("Password must contain at least one number!");
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      toast.error("Password must contain at least one special character!");
+    } else {
+      toast.success("Strong password! ✅");
+    }
   };
 
   const openSignIn = () => {
     navigate("/sign-in");
+  };
+
+  const nameHandler = (name) => {
+    console.log(name);
+    if (name.length <= 5 || /\d/.test(name)) {
+      toast.error("Please enter full name");
+    }
   };
 
   return (
@@ -36,9 +67,12 @@ const SignUp = () => {
         >
           <input
             type="text"
-            placeholder="Name"
+            placeholder="Full name"
             className="w-full border p-2 pl-6 rounded-4xl "
             required
+            onBlur={(e) => {
+              nameHandler(e.target.value);
+            }}
           />
 
           <input
@@ -53,6 +87,10 @@ const SignUp = () => {
             placeholder="Password"
             className="w-full border p-2 pl-6 rounded-4xl"
             required
+            onBlur={(e) => {
+              setPassword(e.target.value);
+              validatePassword(e.target.value)
+            }}
           />
 
           <input
@@ -60,6 +98,9 @@ const SignUp = () => {
             placeholder="Confirm Password"
             className="w-full border p-2 pl-6 rounded-4xl"
             required
+            onBlur={(e) => {
+              setConfirmPassword(e.target.value);
+            }}
           />
 
           <button className="bg-[#fb6505] text-white p-2 w-[45%] rounded-4xl mt-4 cursor-pointer">
