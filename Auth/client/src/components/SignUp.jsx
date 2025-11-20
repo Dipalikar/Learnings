@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChromiumIcon, FacebookIcon, Linkedin } from "lucide-react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import signup_image from "../assets/signup_img.svg";
 import { toast } from "react-hot-toast";
@@ -7,41 +8,47 @@ import { useState } from "react";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const [password, setPassword] = useState();
   const [confirmPassword, setConfirmPassword] = useState();
+  const [form, setForm] = useState({
+    username: "",
+    full_name: "",
+    password: "",
+  });
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-
-    if (password !== confirmPassword) {
+    // console.log(form.password);
+    // console.log(confirmPassword);
+    if (form.password != confirmPassword) {
       toast.error("Confirm password does not match");
     }
-  }
-  const validatePassword = (password) => {
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters long!");
-    } else if (!/[A-Z]/.test(password)) {
-      toast.error("Password must contain at least one uppercase letter!");
-    } else if (!/[a-z]/.test(password)) {
-      toast.error("Password must contain at least one lowercase letter!");
-    } else if (!/[0-9]/.test(password)) {
-      toast.error("Password must contain at least one number!");
-    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      toast.error("Password must contain at least one special character!");
-    } else {
-      toast.success("Strong password! ✅");
+    try {
+      const { data } = await axios.post(
+        "http://localhost:5000/api/sign-up",
+        form,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (data.success) {
+        console.log("Response data:", data);
+      } else {
+        console.log(data);
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error);
     }
+  };
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const openSignIn = () => {
     navigate("/sign-in");
-  };
-
-  const nameHandler = (name) => {
-    console.log(name);
-    if (name.length <= 5 || /\d/.test(name)) {
-      toast.error("Please enter full name");
-    }
   };
 
   return (
@@ -68,28 +75,33 @@ const SignUp = () => {
           <input
             type="text"
             placeholder="Full name"
+            name="full_name"
             className="w-full border p-2 pl-6 rounded-4xl "
             required
-            onBlur={(e) => {
-              nameHandler(e.target.value);
+            onChange={(e) => {
+              handleChange(e);
             }}
           />
 
           <input
             type="text"
             placeholder="Username"
+            name="username"
             className="w-full border p-2 pl-6 rounded-4xl"
             required
+            onChange={(e) => {
+              handleChange(e);
+            }}
           />
 
           <input
             type="password"
             placeholder="Password"
+            name="password"
             className="w-full border p-2 pl-6 rounded-4xl"
             required
-            onBlur={(e) => {
-              setPassword(e.target.value);
-              validatePassword(e.target.value)
+            onChange={(e) => {
+              handleChange(e);
             }}
           />
 
@@ -98,7 +110,7 @@ const SignUp = () => {
             placeholder="Confirm Password"
             className="w-full border p-2 pl-6 rounded-4xl"
             required
-            onBlur={(e) => {
+            onChange={(e) => {
               setConfirmPassword(e.target.value);
             }}
           />
