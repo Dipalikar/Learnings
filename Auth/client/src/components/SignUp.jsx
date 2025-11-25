@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import signup_image from "../assets/signup_img.svg";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
+import { signUpSchema, sanitizeSignUpData } from "../middleware/validation.js";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -17,15 +18,25 @@ const SignUp = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    // console.log(form.password);
-    // console.log(confirmPassword);
+
+    const sanitizedForm = sanitizeSignUpData(form);
     if (form.password != confirmPassword) {
       toast.error("Confirm password does not match");
     }
+    const result = signUpSchema.safeParse(sanitizedForm);
+
+    if (!result.success) {
+      //  show ALL zod errors using toast
+      result.error.issues.forEach((issue) => {
+        toast.error(issue.message);
+      });
+      return;
+    }
+
     try {
       const { data } = await axios.post(
         "http://localhost:5000/api/sign-up",
-        form,
+        sanitizedForm,
         {
           headers: {
             "Content-Type": "application/json",
@@ -34,13 +45,33 @@ const SignUp = () => {
       );
 
       if (data.success) {
-        console.log("Response data:", data);
+        // console.log("Response data:", data);
+        toast.success(data.message);
       } else {
-        console.log(data);
+        // console.log(data);
         toast.error(data.message);
+        // console.log("Response data:", data);
       }
     } catch (error) {
-      toast.error(error);
+      console.log("Error:", error);
+
+      // THIS IS THE FIX: Access error.response.data for backend error messages
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        const errorMessage =
+          error.response.data?.message || "An error occurred during sign up";
+        toast.error(errorMessage);
+        console.log("Error response:", error.response.data);
+      } else if (error.request) {
+        // The request was made but no response was received
+        toast.error("No response from server. Please check your connection.");
+        console.log("Error request:", error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        toast.error("An error occurred. Please try again.");
+        console.log("Error message:", error.message);
+      }
     }
   };
   const handleChange = (e) => {
@@ -138,7 +169,6 @@ const SignUp = () => {
         <p className="text-sm mt-2 text-slate-500">
           Already a member?
           <span className="text-[#d96d18] cursor-pointer" onClick={openSignIn}>
-            {" "}
             Sign in
           </span>
         </p>

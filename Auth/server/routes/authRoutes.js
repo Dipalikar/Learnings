@@ -4,6 +4,6 @@ import { limiter } from "../middleware/rateLimiters.js";
 
 const authRouter = express.Router();
 
-authRouter.post("/sign-up",limiter, userAdd);
+authRouter.post("/sign-up", userAdd);
 
 export default authRouter;
