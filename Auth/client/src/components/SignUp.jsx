@@ -6,6 +6,8 @@ import signup_image from "../assets/signup_img.svg";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { signUpSchema, sanitizeSignUpData } from "../middleware/validation.js";
+import { signUpFunc } from "../lib/actions/auth.js";
+import { useEffect } from "react";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -15,6 +17,10 @@ const SignUp = () => {
     full_name: "",
     password: "",
   });
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) navigate("/dashboard");
+  }, []);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -33,46 +39,7 @@ const SignUp = () => {
       return;
     }
 
-    try {
-      const { data } = await axios.post(
-        "http://localhost:5000/api/sign-up",
-        sanitizedForm,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (data.success) {
-        // console.log("Response data:", data);
-        toast.success(data.message);
-      } else {
-        // console.log(data);
-        toast.error(data.message);
-        // console.log("Response data:", data);
-      }
-    } catch (error) {
-      console.log("Error:", error);
-
-      // THIS IS THE FIX: Access error.response.data for backend error messages
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        const errorMessage =
-          error.response.data?.message || "An error occurred during sign up";
-        toast.error(errorMessage);
-        console.log("Error response:", error.response.data);
-      } else if (error.request) {
-        // The request was made but no response was received
-        toast.error("No response from server. Please check your connection.");
-        console.log("Error request:", error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        toast.error("An error occurred. Please try again.");
-        console.log("Error message:", error.message);
-      }
-    }
+    signUpFunc(sanitizedForm,navigate)
   };
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

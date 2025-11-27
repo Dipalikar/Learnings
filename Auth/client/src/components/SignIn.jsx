@@ -1,12 +1,45 @@
 import { ChromiumIcon, FacebookIcon, Linkedin } from "lucide-react";
-import React from "react";
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import signin_img from "../assets/signin_img.svg"
+import signin_img from "../assets/signin_img.svg";
+import { sanitizeSignIpData, signIpSchema } from "../middleware/validation";
+import { useState } from "react";
+import axios from "axios";
+import { signInFunc } from "../lib/actions/auth";
+import { useEffect } from "react";
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const onSubmitHandler = (e) => {
+
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+  });
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token) navigate("/dashboard");
+}, []);
+
+
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
+
+    const sanitizedForm = sanitizeSignIpData(form);
+
+    const result = signIpSchema.safeParse(sanitizedForm);
+
+    if (!result.success) {
+      //  show ALL zod errors using toast
+      result.error.issues.forEach((issue) => {
+        toast.error(issue.message);
+      });
+      return;
+    }
+
+    signInFunc(sanitizedForm,navigate)
+  };
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const openSignUp = () => {
@@ -17,32 +50,38 @@ const SignIn = () => {
     <div className="flex flex-row h-screen">
       {/* Left Side */}
       <div className="flex flex-1 flex-col items-center justify-center bg-white p-10">
-        <h1 className="text-4xl font-semibold ">
-          Welcome back!
-        </h1>
+        <h1 className="text-4xl font-semibold ">Welcome back!</h1>
         <p className="text-sm text-slate-500">Let's get some work done</p>
 
         <form
           onSubmit={onSubmitHandler}
           className="flex flex-col items-center justify-between w-[60%] gap-5 mt-5 "
         >
-                    <input
+          <input
             type="text"
             placeholder="Username"
+            name="username"
             className="w-full border p-2 pl-6 rounded-4xl"
             required
+            onChange={(e) => {
+              handleChange(e);
+            }}
           />
 
           <input
             type="password"
             placeholder="Password"
+            name="password"
             className="w-full border p-2 pl-6 rounded-4xl"
             required
+            onChange={(e) => {
+              handleChange(e);
+            }}
           />
 
-          <p className="text-sm mt-2 text-slate-500 cursor-pointer">Forgot password?</p>
-
-          
+          <p className="text-sm mt-2 text-slate-500 cursor-pointer">
+            Forgot password?
+          </p>
 
           <button className="bg-[#1a1999] text-white p-2 w-[45%] rounded-4xl mt-2 cursor-pointer">
             Login
@@ -66,7 +105,10 @@ const SignIn = () => {
 
         <p className="text-sm mt-16 text-slate-500">
           Not a member?
-          <span className="text-[#1a1999] cursor-pointer" onClick={openSignUp}> Register now</span>
+          <span className="text-[#1a1999] cursor-pointer" onClick={openSignUp}>
+            {" "}
+            Register now
+          </span>
         </p>
       </div>
 
