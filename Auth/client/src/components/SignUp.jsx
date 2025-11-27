@@ -6,7 +6,7 @@ import signup_image from "../assets/signup_img.svg";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { signUpSchema, sanitizeSignUpData } from "../middleware/validation.js";
-import { signUpFunc } from "../lib/actions/auth.js";
+import { signInFunc, signUpFunc } from "../lib/actions/auth.js";
 import { useEffect } from "react";
 
 const SignUp = () => {
@@ -39,7 +39,22 @@ const SignUp = () => {
       return;
     }
 
-    signUpFunc(sanitizedForm,navigate)
+    const data= await signUpFunc(sanitizedForm,navigate)
+    console.log(data)
+        if (data.success) {
+      // console.log("Response data:", data);
+
+      await signInFunc(sanitizedForm,navigate);
+      toast.success("Sign Up successful")
+      
+      // Redirect to dashboard
+      navigate("/dashboard");  
+    } else {
+      // console.log(data);
+      toast.error(data.message);
+      // console.log("Response data:", data);
+    }
+    
   };
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

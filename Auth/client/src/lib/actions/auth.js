@@ -16,15 +16,7 @@ export const signUpFunc = async (sanitizedForm,navigate) => {
       }
     );
 
-    if (data.success) {
-      // console.log("Response data:", data);
-
-      signInFunc(sanitizedForm,navigate);
-    } else {
-      // console.log(data);
-      toast.error(data.message);
-      // console.log("Response data:", data);
-    }
+    return data
   } catch (error) {
     console.log("Error:", error);
 
@@ -63,18 +55,17 @@ export const signInFunc = async (sanitizedForm,navigate) => {
       },
     });
     console.log(data);
-    if (data.success) {
-      // console.log("Response data:", data);
+     if (data.success) {
       localStorage.setItem("token", data.token);
-
       // Redirect to dashboard
-      navigate("/dashboard");
-      toast.success(data.message);
+      return data
+      
     } else {
       // console.log(data);
       toast.error(data.message);
       // console.log("Response data:", data);
     }
+    
   } catch (error) {
     console.log(error)
     toast.error(error.response.data.message);

@@ -36,7 +36,20 @@ const SignIn = () => {
       return;
     }
 
-    signInFunc(sanitizedForm,navigate)
+    const data= await signInFunc(sanitizedForm,navigate)
+    console.log(data)
+    if (data.success) {
+      
+      // Redirect to dashboard
+      navigate("/dashboard");  
+      toast.success("Sign in successful");
+    } else {
+      // console.log(data);
+      toast.error(data.message);
+      // console.log("Response data:", data);
+    }
+
+    
   };
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
